@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
 	private final String TAG = "mainactivity";
 	private TextView loginTV;
 	private TextView passwordTV;
+	private Button loginBTN;
+	
+	private String username;
+	private String password;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,17 +39,20 @@ public class MainActivity extends AppCompatActivity {
 		loginTV = (TextView) findViewById(R.id.username_TV);
 		passwordTV = (TextView) findViewById(R.id.password_TV);
 		
-		Button inlogButton = (Button) findViewById(R.id.logInButton);
+		loginBTN = (Button) findViewById(R.id.logInButton);
 		
-		inlogButton.setOnClickListener(new View.OnClickListener() {
+		loginBTN.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				
-				String inlogText = loginTV.getText().toString();
-				String passwordText = passwordTV.getText().toString();
+				username = loginTV.getText().toString();
+				password = passwordTV.getText().toString();
 				
-				Intent intent = new Intent(getApplicationContext(), ListActivity.class);
-				startActivity(intent);
+				if ((username.isEmpty()) || (password.isEmpty())) {
+					return;
+				}
+				
+				handleLogin(username, password);
 			}
 		});
 	}
@@ -62,10 +69,15 @@ public class MainActivity extends AppCompatActivity {
 						
 						@Override
 						public void onResponse(JSONObject response) {
-							displayMessage("Succesvol ingelogd!");
 							
 							try {
 								String token = response.getString("token");
+								
+								if (token == null) {
+									throw new Exception("Token not found.");
+								}
+								
+								displayMessage("Succesvol ingelogd!");
 								
 								Context context = getApplicationContext();
 								SharedPreferences sharedPref = context.getSharedPreferences(
@@ -74,13 +86,14 @@ public class MainActivity extends AppCompatActivity {
 								editor.putString(getString(R.string.saved_token), token);
 								editor.commit();
 								
-								Intent main = new Intent(getApplicationContext(), MainActivity.class);
+								Intent main = new Intent(getApplicationContext(), ListActivity.class);
 								startActivity(main);
 								
 								finish();
 								
 							} catch (JSONException e) {
-								// e.printStackTrace();
+								Log.e(TAG, e.getMessage());
+							} catch (Exception e) {
 								Log.e(TAG, e.getMessage());
 							}
 						}
@@ -88,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
 						
 						@Override
 						public void onErrorResponse(VolleyError error) {
+							Log.e("MainActivity", "Error: " + error.getMessage());
 							handleErrorResponse(error);
 						}
 					});
@@ -145,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
 		return trimmedString;
 	}
 	
-	// TODO Verplaats displayMessage naar een centrale 'utility class' voor gebruik in alle classes.
 	public void displayMessage(String toastString) {
 		Toast.makeText(getApplicationContext(), toastString, Toast.LENGTH_LONG).show();
 	}

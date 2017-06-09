@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Practicum5Program.iml" filepath="$PROJECT_DIR$/Practicum5Program.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/practicum5.iml" filepath="$PROJECT_DIR$/practicum5.iml" />
     </modules>
   </component>
 </project>
